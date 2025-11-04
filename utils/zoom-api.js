@@ -5,12 +5,32 @@ const ZOOM_API_BASE_URL = 'https://api.zoom.us/v2';
 const ZOOM_OAUTH_TOKEN_URL = process.env.ZOOM_OAUTH_TOKEN_URL || 'https://zoom.us/oauth/token';
 
 /**
+ * Build OAuth authorization URL for Zoom
+ * @param {{ clientId: string, redirectUri: string, state: string }}
+ * @returns {string} OAuth authorization URL
+ */
+export function buildBasicAuth({ clientId, redirectUri, state }) {
+  if (!clientId) {
+    throw new Error('Missing Zoom client credentials');
+  }
+  
+  const params = new URLSearchParams({
+    response_type: 'code',
+    client_id: clientId,
+    redirect_uri: redirectUri || process.env.ZOOM_REDIRECT_URI,
+    state: state
+  });
+  
+  return `https://zoom.us/oauth/authorize?${params.toString()}`;
+}
+
+/**
  * Build HTTP Basic auth header value for client credentials.
  * @param {string} clientId
  * @param {string} clientSecret
  * @returns {string} e.g., "Basic abc123..."
  */
-export function buildBasicAuth(clientId, clientSecret) {
+export function buildBasicAuthHeader(clientId, clientSecret) {
   if (!clientId || !clientSecret) {
     throw new Error('Missing Zoom client credentials.');
   }
@@ -35,7 +55,7 @@ export async function exchangeCodeForAccessToken({
   const res = await fetch(ZOOM_OAUTH_TOKEN_URL, {
     method: 'POST',
     headers: {
-      Authorization: buildBasicAuth(clientId, clientSecret),
+      Authorization: buildBasicAuthHeader(clientId, clientSecret),
       'Content-Type': 'application/x-www-form-urlencoded',
     },
     body: new URLSearchParams({

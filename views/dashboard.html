@@ -63,18 +63,21 @@
   </head>
   <body>
     <div class="container">
-      <div class="zoom-logo">ZOOM</div>
-      <button id="auth-in-zoom" class="zoom-button">
-        Authenticate and install Zoom Chatbot
+      <div class="zoom-logo">ZOOM Workplace Chatbot</div>
+      <button id="zoom-button" class="zoom-button">
+        Deep Link to Chatbot
       </button>
     </div>
 
     <script>
-      document.getElementById("auth-in-zoom").addEventListener("click", (e) => {
-        const btn = e.currentTarget;
-        btn.disabled = true;
-        btn.textContent = "Redirecting to Zoom…";
-        window.location.href = "/auth/login";
+      const chatbotJid = "robot_v1nhrah1hrqhuexexb5nn5-a@xmpp.zoom.us"; // replace with your bot JID
+
+      document.getElementById("zoom-button").addEventListener("click", () => {
+        const link = `https://zoom.us/launch/chat?jid=${encodeURIComponent(
+          chatbotJid
+        )}`;
+        // open link in a new tab/window
+        window.open(link, "_blank", "noopener,noreferrer");
       });
     </script>
   </body>

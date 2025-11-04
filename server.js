@@ -1,9 +1,13 @@
 import express from 'express';
+import session from 'express-session';
+import crypto from 'crypto';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import messageRoutes from './routes/message-routes.js';
 import webhookRoutes from './routes/zoom-webhookHandler.js';
 import { validateEnvironmentVariables } from './utils/validation.js';
+
+import {buildBasicAuth, exchangeCodeForAccessToken}  from './utils/zoom-api.js';
 
 // Load environment variables
 dotenv.config();
@@ -35,6 +39,9 @@ app.use((req, _res, next) => {
   next();
 });
 
+// Serve static files from views directory
+app.use(express.static('views'));
+
 // Routes
 app.use('/api', messageRoutes);
 app.use('/webhooks', webhookRoutes);
@@ -49,15 +56,92 @@ app.get('/health', (_req, res) => {
   });
 });
 
+// Sessions (for CSRF state). In prod, set cookie.secure = true and trust proxy.
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'dev-secret',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false },
+}));
+
+
+// --- OAuth: start ---
+app.get('/auth/login', (req, res) => {
+  try {
+    const state = crypto.randomBytes(16).toString('hex');
+    req.session.oauth_state = state;
+
+    const url = buildBasicAuth({
+      clientId: process.env.ZOOM_CLIENT_ID,
+      redirectUri: process.env.ZOOM_REDIRECT_URI,
+      state,
+    });
+
+    console.log('Redirecting to Zoom OAuth URL:', url);
+
+    return res.redirect(url);
+  } catch (e) {
+    console.error('OAuth login error:', e);
+    return res.status(500).send('OAuth not configured.');
+  }
+});
+
+// --- OAuth: callback ---
+app.get('/auth/callback', async (req, res) => {
+  try {
+    const { code, state, error, error_description } = req.query;
+
+    if (error) {
+      console.warn('Zoom authorization error:', error, error_description);
+      return res.status(400).send(`Authorization error: ${error}`);
+    }
+    if (!code || !state) return res.status(400).send('Missing code or state.');
+    if (state !== req.session.oauth_state) return res.status(400).send('Invalid state.');
+    delete req.session.oauth_state; // one-time use
+
+    const tokens = await exchangeCodeForAccessToken({
+      code,
+      redirectUri: process.env.ZOOM_REDIRECT_URI,
+      clientId: process.env.ZOOM_CLIENT_ID,
+      clientSecret: process.env.ZOOM_CLIENT_SECRET,
+    });
+
+    // Demo: store tokens in session (use DB/secret store in prod)
+    req.session.zoomTokens = tokens;
+
+    // Option A: redirect to a confirmation page with a button to open in Zoom
+    return res.redirect('/dashboard');
+
+    // Option B: redirect straight into Zoom via a JID deep link:
+    // return res.redirect(process.env.ROBOT_ZOOM_BOT_JID || 'https://zoom.us/launch/chat?jid=robot_example@xmpp.zoom.us');
+  } catch (e) {
+    console.error('OAuth callback error:', e);
+    return res.status(500).send('Token exchange failed.');
+  }
+});
+
+// View routes
+
+app.get('/dashboard', (_req, res) => {
+  res.sendFile('dashboard.html', { root: 'views' });
+});
+
+
+app.get('/', (_req, res) => {
+  res.sendFile('index.html', { root: 'views' });
+});
+
 // Root endpoint
 app.get('/', (_req, res) => {
   res.json({
     message: 'Zoom Team Chatbot API',
     version: '1.0.0',
     endpoints: {
+      home: '/',
       health: '/health',
       webhooks: '/webhooks',
-      api: '/api'
+      api: '/api',
+      dashboard: '/dashboard'
     }
   });
 });
