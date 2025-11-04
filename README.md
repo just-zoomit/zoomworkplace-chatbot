@@ -171,8 +171,8 @@ If you’d like to suggest topics, improvements, or bug fixes, please open an is
 
 ## 📚 Resources
 
-* [Zoom Team Chat API Documentation](https://developers.zoom.us/docs/team-chat-api/)
-* [Zoom Chatbot Documentation](https://developers.zoom.us/docs/api/chatbot/)
+* [Zoom Team Chat API Documentation](https://developers.zoom.us/docs/api/team-chat/)
+* [Zoom Chatbot Documentation](https://developers.zoom.us/docs/team-chat/)
 * [Zoom App Marketplace](https://marketplace.zoom.us/)
 * [Zoom Developer Community Forum](https://devforum.zoom.us/)
 
