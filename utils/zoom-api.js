@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import { getChatbotToken } from './zoom-auth.js';
+import { getChatbotToken } from './zoom-chatbot-auth.js';
 
 const ZOOM_API_BASE_URL = 'https://api.zoom.us/v2';
 const ZOOM_OAUTH_TOKEN_URL = process.env.ZOOM_OAUTH_TOKEN_URL || 'https://zoom.us/oauth/token';

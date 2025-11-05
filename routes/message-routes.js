@@ -1,6 +1,6 @@
 import express from 'express';
 import fetch from 'node-fetch';
-import { getChatbotToken } from '../utils/zoom-auth.js';
+import { getChatbotToken } from '../utils/zoom-chatbot-auth.js';
 import { validateMessagePayload, createValidationMiddleware, sanitizeMessage } from '../utils/validation.js';
 
 const router = express.Router();
