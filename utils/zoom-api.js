@@ -13,14 +13,14 @@ export function buildBasicAuth({ clientId, redirectUri, state }) {
   if (!clientId) {
     throw new Error('Missing Zoom client credentials');
   }
-  
+
   const params = new URLSearchParams({
     response_type: 'code',
     client_id: clientId,
     redirect_uri: redirectUri || process.env.ZOOM_REDIRECT_URI,
     state: state
   });
-  
+
   return `https://zoom.us/oauth/authorize?${params.toString()}`;
 }
 
@@ -82,26 +82,42 @@ export async function exchangeCodeForAccessToken({
  */
 export async function sendChatMessage(toJid, message, replyTo = null) {
   try {
-    
+
     const accessToken = await getChatbotToken();
-    
+
     const body = {
       account_id: "5YQGYK-FSc-0M0DgZTCzkQ",
       "content": {
-          "head": {
-           "text": "Hello World"
-          },
-          "body": [
-           {
+        "head": {
+          "text": "Hello World",
+          "style": { "bold": true }
+        },
+        "body": [
+          {
             "type": "message",
             "text": message
-           }
-          ]
-         },
+          },
+          {
+            "type": "actions",
+            "items": [
+              {
+                "text": "Thumbsup",
+                "value": "thumbsup",
+                "style": "Thumbsup"
+              },
+              {
+                "text": "Thumbsdown",
+                "value": "thumbsdown",
+                "style": "Thumbsdown"
+              }
+            ]
+          }
+        ]
+      },
       robot_jid: "v1nhrah1hrqhuexexb5nn5-a@xmpp.zoom.us",
       to_jid: 'vbdj8euxrduts0tan29tra@xmpp.zoom.us',
       user_jid: "vbdj8euxrduts0tan29tra@xmpp.zoom.us",
-      
+
     };
 
     console.log('Preparing to send message to Zoom Team Chat:', body);
@@ -140,7 +156,7 @@ export async function sendChatMessage(toJid, message, replyTo = null) {
 export async function getChatMessages(toJid, options = {}) {
   try {
     const accessToken = await getChatbotToken();
-    
+
     const queryParams = new URLSearchParams({
       to_jid: toJid,
       page_size: options.page_size || '10',

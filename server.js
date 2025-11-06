@@ -7,6 +7,9 @@ import messageRoutes from './routes/message-routes.js';
 import webhookRoutes from './routes/zoom-webhookHandler.js';
 import oauthRoutes from './routes/oauth-routes.js';
 import { validateEnvironmentVariables } from './utils/validation.js';
+import helmet from 'helmet';
+
+import signRoutes from './routes/signature-routes.js';
 
 // Load environment variables
 dotenv.config();
@@ -31,6 +34,32 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+app.use(helmet({
+  contentSecurityPolicy: {
+    useDefaults: true,
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: [
+        "'self'",
+        "'unsafe-inline'",
+        "https://appssdk.zoom.us",
+        "https://source.zoom.us",
+        "https://cdn.ngrok.com",
+        'https://933b9a9261ca.ngrok.app/webview'
+      ],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.ngrok.com"],
+      fontSrc:  ["'self'", "data:", "https://cdn.ngrok.com"],
+      imgSrc:   ["'self'", "data:", "blob:"],
+      connectSrc: [
+        "'self'", "wss:",
+        "https://zoom.us", "https://*.zoom.us",
+        "https://*.ngrok.app", "https://*.ngrok.io"
+      ],
+      frameAncestors: ["'self'", "https://*.zoom.us"],   // add this
+    },
+  },
+}));
+
 // Request logging middleware
 app.use((req, _res, next) => {
   const timestamp = new Date().toISOString();
@@ -53,6 +82,7 @@ app.use(express.static('views'));
 app.use('/api', messageRoutes);
 app.use('/webhooks', webhookRoutes);
 app.use('/auth', oauthRoutes);
+app.use('/apps', signRoutes);
 
 // Health check endpoint
 app.get('/health', (_req, res) => {
@@ -69,6 +99,10 @@ app.get('/health', (_req, res) => {
 // View routes
 app.get('/dashboard', (_req, res) => {
   res.sendFile('dashboard.html', { root: 'views' });
+});
+
+app.get('/webview', (_req, res) => {
+  res.sendFile('webview.html', { root: 'views' });
 });
 
 app.get('/', (_req, res) => {

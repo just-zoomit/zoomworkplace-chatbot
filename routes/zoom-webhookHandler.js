@@ -1,6 +1,8 @@
 import express from 'express';
-import { callAnthropicAPI } from '../utils/anthropic.js';
 import { validateWebhookPayload, createValidationMiddleware } from '../utils/validation.js';
+
+import { sendChatMessage } from '../utils/zoom-api.js';
+import { callAnthropicAPI } from '../utils/anthropic.js';
 
 const router = express.Router();
 
@@ -14,15 +16,27 @@ async function handleZoomWebhook(req, res) {
     const { event, payload } = req.body;
     
     console.log(`Received Zoom webhook event: ${event}`);
+    console.log('Payload:', payload);
+
+    const toJid = payload?.toJid;
+    const message = payload?.cmd || payload?.message || '';
+   
 
     switch (event) {
-      case 'bot_notification':
-        console.log('Processing bot notification from Zoom Team Chat');
-        await callAnthropicAPI(payload, true);
+      case 'bot_installed':
+        
+        console.log('Zoom Team Chat bot installed successfully');
         break;
 
-      case 'bot_installed':
-        console.log('Zoom Team Chat bot installed successfully');
+      case 'bot_notification':
+        console.log('Processing bot notification from Zoom Team Chat');
+        sendChatMessage(toJid, message)
+        //await callAnthropicAPI(payload, true);
+        break;
+      
+      case 'interactive_message_actions'  :
+        console.log('Processing interactive message action from Zoom Team Chat');
+        sendChatMessage(toJid, `You clicked a button with value: ${payload?.actionItem?.value || 'unknown'}`);
         break;
 
       case 'app_deauthorized':
