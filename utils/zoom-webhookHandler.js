@@ -34,8 +34,8 @@ async function handleZoomWebhook(req, res) {
 
       case 'bot_notification':
         console.log('Processing bot notification from Zoom Team Chat');
-        //sendChatMessage(toJid, message );
-        await callAnthropicAPI(payload, true);
+        sendChatMessage(toJid, message );
+        //await callAnthropicAPI(payload, true);
         break;
       
       case 'interactive_message_actions'  :
