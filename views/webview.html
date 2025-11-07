@@ -102,8 +102,7 @@
       // Check if running in Zoom client
       function checkZoomEnvironment() {
         if (typeof window.zoomSdk === "undefined") {
-          document.getElementById("not-in-zoom-message").style.display =
-            "block";
+          document.getElementById("not-in-zoom-message").style.display = "block";
           document.getElementById("main-content").style.display = "none";
           return false;
         }
@@ -168,9 +167,9 @@
           showStatus("Sending chat context...", "info");
 
           const contextMessage = `Chat Context Info:
-📧 Chat Type: ${chatContext.chatType || "Unknown"}
-👥 Participants: ${chatContext.participants?.length || 0}
-💬 Content: ${chatContext.content || "No content"}`;
+          📧 Chat Type: ${chatContext.chatType || "Unknown"}
+          👥 Participants: ${chatContext.participants?.length || 0}
+          💬 Content: ${chatContext.content || "No content"}`;
 
           await zoomSdk.sendMessageToChat({
             message: contextMessage,
