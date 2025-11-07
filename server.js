@@ -1,15 +1,15 @@
 import express from 'express';
 import session from 'express-session';
-import crypto from 'crypto';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import messageRoutes from './routes/message-routes.js';
-import webhookRoutes from './routes/zoom-webhookHandler.js';
-import oauthRoutes from './routes/oauth-routes.js';
-import { validateEnvironmentVariables } from './utils/validation.js';
 import helmet from 'helmet';
 
+import oauthRoutes from './routes/oauth-routes.js';
+import webhookRoutes from './routes/zoom-webhookHandler.js';
+import messageRoutes from './routes/message-routes.js';
 import signRoutes from './routes/signature-routes.js';
+
+import { validateEnvironmentVariables } from './utils/validation.js';
 
 // Load environment variables
 dotenv.config();
@@ -47,7 +47,6 @@ app.use(helmet({
         "https://cdn.ngrok.com"
       ],
       styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.ngrok.com"],
-      fontSrc:  ["'self'", "data:", "https://cdn.ngrok.com"],
       imgSrc:   ["'self'", "data:", "blob:"],
       connectSrc: [
         "'self'", "wss:",
