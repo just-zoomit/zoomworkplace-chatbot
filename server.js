@@ -44,8 +44,7 @@ app.use(helmet({
         "'unsafe-inline'",
         "https://appssdk.zoom.us",
         "https://source.zoom.us",
-        "https://cdn.ngrok.com",
-        'https://933b9a9261ca.ngrok.app/webview'
+        "https://cdn.ngrok.com"
       ],
       styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.ngrok.com"],
       fontSrc:  ["'self'", "data:", "https://cdn.ngrok.com"],
@@ -55,7 +54,7 @@ app.use(helmet({
         "https://zoom.us", "https://*.zoom.us",
         "https://*.ngrok.app", "https://*.ngrok.io"
       ],
-      frameAncestors: ["'self'", "https://*.zoom.us"],   // add this
+      frameAncestors: ["'self'", "https://*.zoom.us"], 
     },
   },
 }));
