@@ -41,6 +41,7 @@ async function handleZoomWebhook(req, res) {
       case 'interactive_message_actions'  :
         console.log('Processing interactive message action from Zoom Team Chat');
         sendChatMessage(toJid, `You clicked a button with value: ${payload?.actionItem?.value || 'unknown'}`);
+        
         break;
 
       case 'app_deauthorized':
