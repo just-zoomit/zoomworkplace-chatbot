@@ -5,9 +5,8 @@ import dotenv from 'dotenv';
 import helmet from 'helmet';
 
 import oauthRoutes from './routes/oauth-routes.js';
-import webhookRoutes from './routes/zoom-webhookHandler.js';
-import messageRoutes from './routes/message-routes.js';
-import signRoutes from './routes/signature-routes.js';
+
+
 
 import { validateEnvironmentVariables } from './utils/validation.js';
 
@@ -77,10 +76,9 @@ app.use(session({
 app.use(express.static('views'));
 
 // Routes
-app.use('/api', messageRoutes);
-app.use('/webhooks', webhookRoutes);
+
+
 app.use('/auth', oauthRoutes);
-app.use('/apps', signRoutes);
 
 // Health check endpoint
 app.get('/health', (_req, res) => {
