@@ -20,6 +20,10 @@ async function handleZoomWebhook(req, res) {
 
     const toJid = payload?.toJid;
     const message = payload?.cmd || payload?.message || '';
+    const userId = payload?.userJid;
+    const accountId = payload?.accountId;
+    const robot_jid = payload?.robotJid;
+
    
 
     switch (event) {
@@ -30,7 +34,7 @@ async function handleZoomWebhook(req, res) {
 
       case 'bot_notification':
         console.log('Processing bot notification from Zoom Team Chat');
-        sendChatMessage(toJid, message)
+        sendChatMessage(toJid, message );
         //await callAnthropicAPI(payload, true);
         break;
       
